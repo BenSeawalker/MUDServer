@@ -4,28 +4,42 @@
 // size of our buffer
 #define DEFAULT_BUFLEN 512
 // port to connect sockets through 
-#define DEFAULT_PORT "6881"
+#define DEFAULT_PORT "2023"
 
-#define MAX_PACKET_SIZE 1000000
+const UINT PACKET_HEADER_SIZE = (sizeof(UINT) * 2);
 
-enum PacketTypes {
+//typedef unsigned int UINT;
 
-	INIT_CONNECTION = 0,
-
-	ACTION_EVENT = 1,
-
+enum PacketTypes
+{
+	INIT_CONNECTION,
+	CONNECTION_COMPLETE,
+	ACTION_EVENT,
 };
 
-struct Packet {
+struct Packet
+{
+	UINT type;
+	UINT data_size;
+	char * data = nullptr;
 
-	unsigned int packet_type;
-	char packet_data[DEFAULT_BUFLEN];
-
-	void serialize(char * data) {
-		memcpy(data, this, sizeof(Packet));
+	~Packet()
+	{
+		delete[] data;
 	}
 
-	void deserialize(char * data) {
-		memcpy(this, data, sizeof(Packet));
+	void serialize(char * _data)
+	{
+		UINT size = sizeof(UINT);
+		memcpy(_data, &type, size);						//type
+		memcpy(_data + size, &data_size, size);			//data_size
+		memcpy(_data + (size * 2), data, data_size);	//data
+	}
+
+	void deserialize(char * _header)
+	{
+		UINT size = sizeof(UINT);
+		memcpy(&type, _header, size);				//type
+		memcpy(&data_size, _header + size, size);	//data_size
 	}
 };

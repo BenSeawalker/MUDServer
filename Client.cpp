@@ -1,8 +1,9 @@
-#include "ClientNetwork.h"
+#include "Client.h"
 
 
-ClientNetwork::ClientNetwork(void)
+Client::Client()
 {
+	Client_ID = -1;
 
 	// create WSADATA object
 	WSADATA wsaData;
@@ -16,10 +17,10 @@ ClientNetwork::ClientNetwork(void)
 		hints;
 
 	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	int i_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	if (iResult != 0) {
-		printf("WSAStartup failed with error: %d\n", iResult);
+	if (i_result != 0) {
+		printf("WSAStartup failed with error: %d\n", i_result);
 		exit(1);
 	}
 
@@ -31,11 +32,11 @@ ClientNetwork::ClientNetwork(void)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;  //TCP connection!!!
 	//resolve server address and port 
-	iResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
+	i_result = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
 
-	if (iResult != 0)
+	if (i_result != 0)
 	{
-		printf("getaddrinfo failed with error: %d\n", iResult);
+		printf("getaddrinfo failed with error: %d\n", i_result);
 		WSACleanup();
 		exit(1);
 	}
@@ -54,9 +55,9 @@ ClientNetwork::ClientNetwork(void)
 		}
 
 		// Connect to server.
-		iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		i_result = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 
-		if (iResult == SOCKET_ERROR)
+		if (i_result == SOCKET_ERROR)
 		{
 			closesocket(ConnectSocket);
 			ConnectSocket = INVALID_SOCKET;
@@ -82,8 +83,8 @@ ClientNetwork::ClientNetwork(void)
 	// Set the mode of the socket to be nonblocking
 	u_long iMode = 1;
 
-	iResult = ioctlsocket(ConnectSocket, FIONBIO, &iMode);
-	if (iResult == SOCKET_ERROR)
+	i_result = ioctlsocket(ConnectSocket, FIONBIO, &iMode);
+	if (i_result == SOCKET_ERROR)
 	{
 		printf("ioctlsocket failed with error: %d\n", WSAGetLastError());
 		closesocket(ConnectSocket);
@@ -94,25 +95,31 @@ ClientNetwork::ClientNetwork(void)
 	//disable nagle
 	char value = 1;
 	setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, &value, sizeof(value));
-
 }
 
-ClientNetwork::~ClientNetwork()
+
+Client::~Client()
 {
 }
 
 
-int ClientNetwork::receivePackets(char * recvbuf)
+int Client::ReceivePacket(Packet * _packet)
 {
-	iResult = NetworkServices::receiveMessage(ConnectSocket, recvbuf, MAX_PACKET_SIZE);
+	int i_result = NetworkServices::ReceivePacket(ConnectSocket, _packet);
 
-	if (iResult == 0)
+	if (i_result == 0)
 	{
-		printf("Connection closed\n");
-		closesocket(ConnectSocket);
-		WSACleanup();
-		exit(1);
+		printf("Connection Lost!\n");
+		Disconnect();
 	}
 
-	return iResult;
+	return i_result;
+}
+
+
+void Client::Disconnect()
+{
+	printf("Connection closed\n");
+	closesocket(ConnectSocket);
+	WSACleanup();
 }

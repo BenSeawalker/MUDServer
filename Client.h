@@ -5,23 +5,24 @@
 #include <WS2tcpip.h>
 #include <stdio.h>
 
-#include "NetworkData.h"
-
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
 
-class ClientNetwork
+class Client
 {
 public:
-	ClientNetwork();
-	~ClientNetwork();
-
-	int iResult;
+	Client();
+	~Client();
+	
 	SOCKET ConnectSocket;
+	UINT Client_ID;
 
-	int receivePackets(char *);
+	void Disconnect();
+
+
+	int ReceivePacket(Packet * _packet);
 };
 

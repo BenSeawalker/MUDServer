@@ -1,8 +1,7 @@
 #pragma once
 #include <winsock2.h>
 #include <Windows.h>
-#include "ClientNetwork.h"
-#include "NetworkData.h"
+#include "Client.h"
 
 class ClientGame
 {
@@ -10,14 +9,10 @@ public:
 	ClientGame();
 	~ClientGame();
 
-	ClientNetwork * network;
-	
-	char network_data[MAX_PACKET_SIZE];
+	Client * network;
 
 	void sendActionPackets();
 
 	void update();
-
-	void sendPacket(PacketTypes, char *);
 };
 

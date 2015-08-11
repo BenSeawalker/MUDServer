@@ -5,7 +5,7 @@
 
 ServerGame * server;
 ClientGame * client;
-ClientGame * client2;
+//ClientGame * client2;
 
 void serverLoop(void *);
 void clientLoop(void);
@@ -17,11 +17,11 @@ int main()
 	server = new ServerGame();
 
 	// create thread with arbitrary argument for the run function
-	_beginthread(serverLoop, 0, (void*)12);
+	_beginthread(serverLoop, 0, "");
 
 	// initialize the client 
 	client = new ClientGame();
-	client2 = new ClientGame();
+	//client2 = new ClientGame();
 
 	clientLoop();
 }
@@ -41,6 +41,6 @@ void clientLoop()
 	{
 		//do game stuff
 		client->update();
-		client2->update();
+		//client2->update();
 	}
 }
