@@ -8,8 +8,6 @@
 //---------------------------------------------------------------------------
 Server::Server()
 {
-	UID = 1;
-
 	// for error checking return values
 	int i_result;
 
@@ -29,7 +27,7 @@ Server::Server()
 	i_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (i_result != 0) {
 		printf("WSAStartup failed with error: %d\n", i_result);
-		exit(1);
+		Game_Running = false;
 	}
 
 	// set address information
@@ -45,7 +43,7 @@ Server::Server()
 	if (i_result != 0) {
 		printf("getaddrinfo failed with error: %d\n", i_result);
 		WSACleanup();
-		exit(1);
+		Game_Running = false;
 	}
 
 	// Create a SOCKET for connecting to server
@@ -55,7 +53,7 @@ Server::Server()
 		printf("socket failed with error: %ld\n", WSAGetLastError());
 		freeaddrinfo(result);
 		WSACleanup();
-		exit(1);
+		Game_Running = false;
 	}
 
 	// Set the mode of the socket to be nonblocking
@@ -66,7 +64,7 @@ Server::Server()
 		printf("ioctlsocket failed with error: %d\n", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
-		exit(1);
+		Game_Running = false;
 	}
 
 	// Setup the TCP listening socket
@@ -77,7 +75,7 @@ Server::Server()
 		freeaddrinfo(result);
 		closesocket(ListenSocket);
 		WSACleanup();
-		exit(1);
+		Game_Running = false;
 	}
 
 	// no longer need address information
@@ -90,7 +88,7 @@ Server::Server()
 		printf("listen failed with error: %d\n", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
-		exit(1);
+		Game_Running = false;
 	}
 }
 
@@ -111,7 +109,10 @@ Server::~Server()
 
 		if (client_socket != INVALID_SOCKET)
 		{
-			ncid = UID++;
+			//get the lowest available client #
+			ncid = 1;
+			while (Sessions.find(ncid) != Sessions.end())
+				ncid++;
 
 			//disable nagle on the client's socket
 			char value = 1;
@@ -120,28 +121,43 @@ Server::~Server()
 			// insert new client into session id table
 			Sessions.insert(pair<UINT, SOCKET>(ncid, client_socket));
 
-			char * data = NetworkServices::SerializeData(&ncid);
-			NetworkServices::SendPacket(client_socket, INIT_CONNECTION, data, sizeof(UINT));
-			delete data;
+			//char * data = NetworkServices::SerializeData(&ncid);
+			NetworkServices::SendPacket(client_socket, INIT_CONNECTION, &ncid, sizeof(UINT));
+			//delete data;
 		}
 
 		return ncid;
 	}
 
-	bool Server::DisconnectClient(UINT & _clientID)
+	/*void Server::DisconnectClient(UINT & _clientID)
 	{
-		bool success = (Sessions.find(_clientID) != Sessions.end());
+		map<UINT, SOCKET>::iterator iter(Sessions.find(_clientID));
 
-		if (success)
+		if (iter != Sessions.end())
 		{
 			SOCKET client_socket = Sessions[_clientID];
 			
 			printf("Connection to Client %d closed\n", _clientID);
 			closesocket(client_socket);
-			Sessions.erase(client_socket);
+			Sessions.erase(iter);
 		}
+	}*/
 
-		return success;
+	void Server::HandleDisconnectedClients()
+	{
+		std::map<unsigned int, SOCKET>::iterator iter;
+
+		for (iter = Sessions.begin(); iter != Sessions.end();)
+		{
+			if (!NetworkServices::IsSocketAlive(iter->second))
+			{
+				printf("Connection to Client %d closed\n", iter->first);
+				closesocket(iter->second);
+				Sessions.erase(iter++);
+			}
+			else
+				++iter;
+		}
 	}
 
 
@@ -153,14 +169,9 @@ int Server::ReceiveData(UINT _clientID, Packet * _packet)
 
 	if (Sessions.find(_clientID) != Sessions.end())
 	{
-		SOCKET currentSocket = Sessions[_clientID];
-
-		i_result = NetworkServices::ReceivePacket(currentSocket, _packet);
-		if (i_result == 0)
-		{
-			DisconnectClient(_clientID);
-		}
+		i_result = NetworkServices::ReceivePacket(Sessions[_clientID], _packet);
 	}
+		
 
 	return i_result;
 }
@@ -184,7 +195,7 @@ void Server::SendToAll(PacketTypes _type, char * _data, UINT _dataSize)
 		if (i_result == SOCKET_ERROR)
 		{
 			printf("send failed with error: %d\n", WSAGetLastError());
-			DisconnectClient(current_socket);
+//			DisconnectClient(current_socket);
 		}
 	}
 }

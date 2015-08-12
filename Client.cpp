@@ -21,7 +21,7 @@ Client::Client()
 
 	if (i_result != 0) {
 		printf("WSAStartup failed with error: %d\n", i_result);
-		exit(1);
+		Disconnect();
 	}
 
 
@@ -32,13 +32,12 @@ Client::Client()
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;  //TCP connection!!!
 	//resolve server address and port 
-	i_result = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result);
+	i_result = getaddrinfo(Server_Address, DEFAULT_PORT, &hints, &result);
 
 	if (i_result != 0)
 	{
 		printf("getaddrinfo failed with error: %d\n", i_result);
-		WSACleanup();
-		exit(1);
+		Disconnect();
 	}
 
 	// Attempt to connect to an address until one succeeds
@@ -50,8 +49,7 @@ Client::Client()
 
 		if (ConnectSocket == INVALID_SOCKET) {
 			printf("socket failed with error: %ld\n", WSAGetLastError());
-			WSACleanup();
-			exit(1);
+			Disconnect();
 		}
 
 		// Connect to server.
@@ -76,8 +74,7 @@ Client::Client()
 	if (ConnectSocket == INVALID_SOCKET)
 	{
 		printf("Unable to connect to server!\n");
-		WSACleanup();
-		exit(1);
+		Disconnect();
 	}
 
 	// Set the mode of the socket to be nonblocking
@@ -87,9 +84,7 @@ Client::Client()
 	if (i_result == SOCKET_ERROR)
 	{
 		printf("ioctlsocket failed with error: %d\n", WSAGetLastError());
-		closesocket(ConnectSocket);
-		WSACleanup();
-		exit(1);
+		Disconnect();
 	}
 
 	//disable nagle
@@ -99,8 +94,7 @@ Client::Client()
 
 
 Client::~Client()
-{
-}
+{}
 
 
 int Client::ReceivePacket(Packet * _packet)
@@ -122,4 +116,6 @@ void Client::Disconnect()
 	printf("Connection closed\n");
 	closesocket(ConnectSocket);
 	WSACleanup();
+
+	Game_Running = false;
 }

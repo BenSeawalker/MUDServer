@@ -10,7 +10,6 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-
 class Client
 {
 public:

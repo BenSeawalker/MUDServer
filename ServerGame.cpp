@@ -5,6 +5,8 @@ ServerGame::ServerGame()
 {
 	// set up the server network to listen 
 	network = new Server();
+
+	printf("Server Started\n");
 }
 
 
@@ -19,23 +21,23 @@ void ServerGame::update()
 	if (client_id > -1)
 		printf("client %d has been connected to the server\n", client_id);
 
+	network->HandleDisconnectedClients();
+
 	ReceiveFromClients();
 }
 
 
 void ServerGame::ReceiveFromClients()
 {
-	
-
 	// go through all clients
 	std::map<unsigned int, SOCKET>::iterator iter;
 
 	for (iter = network->Sessions.begin(); iter != network->Sessions.end(); iter++)
 	{
 		Packet * packet = new Packet();
-		int data_length = network->ReceiveData(iter->first, packet);
+		int i_result = network->ReceiveData(iter->first, packet);
 
-		if (data_length > 0)
+		if (i_result > 0)
 		{
 			switch (packet->type)
 			{

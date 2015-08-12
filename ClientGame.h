@@ -11,8 +11,6 @@ public:
 
 	Client * network;
 
-	void sendActionPackets();
-
 	void update();
 };
 

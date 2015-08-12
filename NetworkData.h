@@ -1,19 +1,18 @@
 #pragma once
 #include <string.h>
 
-// size of our buffer
-#define DEFAULT_BUFLEN 512
 // port to connect sockets through 
 #define DEFAULT_PORT "2023"
 
+extern char Server_Address[];
+
 const UINT PACKET_HEADER_SIZE = (sizeof(UINT) * 2);
 
-//typedef unsigned int UINT;
+extern bool Game_Running;
 
 enum PacketTypes
 {
 	INIT_CONNECTION,
-	CONNECTION_COMPLETE,
 	ACTION_EVENT,
 };
 

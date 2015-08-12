@@ -8,6 +8,7 @@
 #include "NetworkServices.h"
 
 using std::pair;
+using std::map;
 
 class Server
 {
@@ -19,14 +20,13 @@ public:
 	SOCKET ListenSocket;
 
 	// table to keep track of each client's socket
-	std::map<UINT, SOCKET> Sessions;
+	map<UINT, SOCKET> Sessions;
 
 	// accept new connections
 	int AcceptNewClient();
 
-	// disconnect client
-	bool DisconnectClient(UINT & _clientID);
-
+	// check for disconnected clients
+	void HandleDisconnectedClients();
 
 	// receive incoming data
 	int ReceiveData(UINT _clientID, Packet * _packet);
@@ -36,7 +36,7 @@ public:
 
 
 private:
-	// unique id for each client
-	UINT UID;
+	// disconnect client
+	//void DisconnectClient(UINT & _clientID);
 };
 
