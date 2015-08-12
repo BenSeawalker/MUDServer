@@ -16,15 +16,15 @@ ClientGame::~ClientGame()
 
 void ClientGame::update()
 {
-	Packet packet;
-	int data_length = network->ReceivePacket(&packet);
+	Packet * packet = new Packet();
+	int data_length = network->ReceivePacket(packet);
 
-	if (data_length)
+	if (data_length > 0)
 	{
-		switch (packet.type)
+		switch (packet->type)
 		{
-			case CONNECTION_COMPLETE:
-				memcpy(&network->Client_ID, packet.data, packet.data_size);
+			case INIT_CONNECTION:
+				memcpy(&network->Client_ID, packet->data, packet->data_size);
 				printf("client %d received init connection packet from server\n", network->Client_ID);
 			break;
 
@@ -37,6 +37,8 @@ void ClientGame::update()
 			break;
 		}
 	}
+
+	delete packet;
 }
 
 

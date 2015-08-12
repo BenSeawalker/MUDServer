@@ -5,14 +5,13 @@
 
 ServerGame * server;
 ClientGame * client;
-//ClientGame * client2;
+ClientGame * client2;
 
 void serverLoop(void *);
 void clientLoop(void);
 
 int main()
 {
-
 	// initialize the server
 	server = new ServerGame();
 
@@ -21,7 +20,7 @@ int main()
 
 	// initialize the client 
 	client = new ClientGame();
-	//client2 = new ClientGame();
+	client2 = new ClientGame();
 
 	clientLoop();
 }
@@ -41,6 +40,6 @@ void clientLoop()
 	{
 		//do game stuff
 		client->update();
-		//client2->update();
+		client2->update();
 	}
 }

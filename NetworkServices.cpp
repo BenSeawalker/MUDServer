@@ -64,6 +64,8 @@
 			i_result = recv(_socket, _packet->data, _packet->data_size, 0);
 		}
 
+		delete header;
+
 		return i_result;
 	}
 
@@ -80,6 +82,18 @@
 		memcpy(packet->data, _data, _dataSize);
 
 		return packet;
+	}
+
+
+
+//	DATA MANAGEMENT
+	
+	char * NetworkServices::SerializeData(void * _data)
+	{
+		char * serialized_data = new char[sizeof(_data)];
+		memcpy(serialized_data, _data, sizeof(_data));
+
+		return serialized_data;
 	}
 
 /*****************************************************************************

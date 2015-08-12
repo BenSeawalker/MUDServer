@@ -120,9 +120,9 @@ Server::~Server()
 			// insert new client into session id table
 			Sessions.insert(pair<UINT, SOCKET>(ncid, client_socket));
 
-			char * data = new char[sizeof(UINT)];
-			memcpy(data, &ncid, sizeof(UINT));
-			NetworkServices::SendPacket(client_socket, CONNECTION_COMPLETE, data, sizeof(UINT));
+			char * data = NetworkServices::SerializeData(&ncid);
+			NetworkServices::SendPacket(client_socket, INIT_CONNECTION, data, sizeof(UINT));
+			delete data;
 		}
 
 		return ncid;
@@ -155,7 +155,7 @@ int Server::ReceiveData(UINT _clientID, Packet * _packet)
 	{
 		SOCKET currentSocket = Sessions[_clientID];
 
-		i_result = NetworkServices::ReceivePacket(_clientID, _packet);
+		i_result = NetworkServices::ReceivePacket(currentSocket, _packet);
 		if (i_result == 0)
 		{
 			DisconnectClient(_clientID);

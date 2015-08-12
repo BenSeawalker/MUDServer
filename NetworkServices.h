@@ -12,5 +12,7 @@ public:
 	static int ReceivePacket(SOCKET _socket, Packet * _packet);
 
 	static Packet * CreatePacket(PacketTypes _type, char * _data, UINT _dataSize);
+
+	static char * SerializeData(void * _data);
 };
 
