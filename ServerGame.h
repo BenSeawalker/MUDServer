@@ -1,6 +1,8 @@
 #pragma once
 #include "Server.h"
 
+#include "GameData.h"
+using namespace GameData;
 
 class ServerGame
 {
@@ -8,7 +10,7 @@ public:
 	ServerGame();
 	~ServerGame();
 
-	void update();
+	void Update();
 
 	void ReceiveFromClients();
 

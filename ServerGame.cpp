@@ -6,7 +6,7 @@ ServerGame::ServerGame()
 	// set up the server network to listen 
 	network = new Server();
 
-	printf("Server Started\n");
+	printf("\n\nSERVER STARTED\n\n");
 }
 
 
@@ -14,8 +14,24 @@ ServerGame::~ServerGame()
 {}
 
 
-void ServerGame::update()
+void ServerGame::Update()
 {
+	static int c = 0;
+
+	c++;
+	if (c > 200000)
+	{
+		std::map<unsigned int, SOCKET>::iterator iter;
+
+		for (iter = network->Sessions.begin(); iter != network->Sessions.end(); iter++)
+		{
+			char message[] = "Test";
+			NetworkServices::SendPacket(iter->second, ACTION_EVENT, message, strlen(message) + 1);
+		}
+
+		c = 0;
+	}
+
 	UINT client_id = network->AcceptNewClient();
 	// get new clients
 	if (client_id > -1)

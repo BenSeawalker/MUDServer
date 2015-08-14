@@ -78,8 +78,10 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientGame.h" />
+    <ClInclude Include="GameData.h" />
     <ClInclude Include="NetworkData.h" />
     <ClInclude Include="NetworkServices.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="ServerGame.h" />
   </ItemGroup>
@@ -87,6 +89,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientGame.cpp" />
     <ClCompile Include="NetworkServices.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="ServerGame.cpp" />
     <ClCompile Include="Stub.cpp" />

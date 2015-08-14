@@ -1,12 +1,10 @@
 #include "ServerGame.h"
 #include "ClientGame.h"
+
+#include "GameData.h"
+using namespace GameData;
 // used for multi-threading
 //#include <process.h>
-
-#include <iostream>
-using std::cout;
-using std::cin;
-using std::endl;
 
 
 ServerGame * server;
@@ -16,25 +14,25 @@ ClientGame * client;
 void ServerLoop();
 void ClientLoop();
 
-void GetInput(int * _i);
-void GetInput(char * _c);
-void GetInput(char * _s, UINT _size);
-
 
 bool Game_Running = true;
 char Server_Address[16] = "127.0.0.1";
+
+
 
 int main()
 {
 	int input;
 	bool menu = true;
 
+	
+
 	while (menu)
 	{
-		cout << "MUDServer Example\n"
+		cout << "\nMUDServer Example\n"
 			<< "\n1. Start Client"
 			<< "\n2. Start Server"
-			<< "\n3. Change Server ip: " << Server_Address
+			<< "\n3. Change Server Address: " << Server_Address
 			<< "\n4. Exit"
 			<< "\n\nInput: ";
 		GetInput(&input);
@@ -60,6 +58,10 @@ int main()
 			case 4:
 				menu = false;
 				break;
+
+			default:
+				cout << "Invalid Input!\n";
+				break;
 		}
 	}
 	
@@ -75,36 +77,13 @@ int main()
 void ServerLoop()
 {
 	while (Game_Running)
-		server->update();
+		server->Update();
 }
 
 void ClientLoop()
 {
 	while (Game_Running)
-		client->update();
+		client->Update();
 }
 
 
-void GetInput(int * _i)
-{
-	cin.ignore(cin.rdbuf()->in_avail());
-	cin.clear();
-
-	cin >> *_i;
-}
-
-void GetInput(char * _c)
-{
-	cin.ignore(cin.rdbuf()->in_avail());
-	cin.clear();
-
-	cin.get(*_c);
-}
-
-void GetInput(char * _s, UINT _size)
-{
-	cin.ignore(cin.rdbuf()->in_avail());
-	cin.clear();
-
-	cin.getline(_s, _size);
-}
